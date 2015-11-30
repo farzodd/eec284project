@@ -70,7 +70,7 @@ public class ValueActivity extends AppCompatActivity {
                         Log.d("messagecheck",commandMsg);
                         try {
                             device.callFunction("movestepper", Py.list(commandMsg));
-                            variable = "Moving CW";
+                            variable = "CW Movement Complete";
                         } catch (ParticleDevice.FunctionDoesNotExistException e) {
                             Toaster.s(ValueActivity.this, "Function doesn't exist.");
                             variable = "Func not found";
@@ -122,7 +122,7 @@ public class ValueActivity extends AppCompatActivity {
                         //Log.d("messagecheck",commandMsg);
                         try {
                             device.callFunction("movestepper", Py.list(commandMsg));
-                            variable = "Moving CCW";
+                            variable = "CCW Movement Complete";
                         } catch (ParticleDevice.FunctionDoesNotExistException e) {
                             Toaster.s(ValueActivity.this, "Function doesn't exist.");
                             variable = "Func not found";
