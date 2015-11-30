@@ -9,11 +9,13 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.io.IOException;
+import java.util.List;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleDevice;
 import io.particle.android.sdk.utils.Async;
+import io.particle.android.sdk.utils.Py;
 import io.particle.android.sdk.utils.Toaster;
 
 public class LoginActivity extends AppCompatActivity {
@@ -22,13 +24,18 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        final String ARG_DEVICEID = "ARG_DEVICEID";
+
+
 
         findViewById(R.id.login_button).setOnClickListener(
                 new View.OnClickListener() {
+
                     @Override
                     public void onClick(final View v) {
                         final String email = ((EditText) findViewById(R.id.email)).getText().toString();
                         final String password = ((EditText) findViewById(R.id.password)).getText().toString();
+                        //ParticleDevice particleDevice = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
 
                         // Don't:
                         AsyncTask task = new AsyncTask() {
@@ -59,26 +66,29 @@ public class LoginActivity extends AppCompatActivity {
 
                         //-------
 
-                        // DO!:
+                        // DO!
+
                         Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Object>() {
 
                             private ParticleDevice mDevice;
+
 
                             @Override
                             public Object callApi(ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
                                 sparkCloud.logIn(email, password);
                                 sparkCloud.getDevices();
                                 mDevice = sparkCloud.getDevice("50ff71065067545632430687");
-                                Object obj;
+                                int returnVal;
+
 
                                 try {
-                                    obj = mDevice.getVariable("analogvalue");
-                                    Log.d("BANANA", "analogvalue: " + obj);
-                                } catch (ParticleDevice.VariableDoesNotExistException e) {
-                                    Toaster.s(LoginActivity.this, "Error reading variable0");
-                                    obj = 500;
+                                    returnVal = mDevice.callFunction("digitalwrite", Py.list("D7","1"));
+                                    Log.d("BANANA", "analogvalue: " + returnVal);
+                                } catch (ParticleDevice.FunctionDoesNotExistException e) {
+                                    Toaster.s(LoginActivity.this, "Function doesn't exist.");
+                                    returnVal = 500;
                                 }
-
+                                /*
                                 try {
                                     String strVariable = mDevice.getStringVariable("stringvalue");
                                     Log.d("BANANA", "stringvalue: " + strVariable);
@@ -99,8 +109,10 @@ public class LoginActivity extends AppCompatActivity {
                                 } catch (ParticleDevice.VariableDoesNotExistException e) {
                                     Toaster.s(LoginActivity.this, "Error reading variable3");
                                 }
+                                */
 
-                                return 100;
+
+                                return 1;
 
                             }
 
